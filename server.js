@@ -11,5 +11,6 @@ http.createServer(function (request, response) {
     if(url=='/artists')
     response.write("All Artists Data in JSON format from Mongo DB");
     if(url=='/genres')
-    response.write("All Genres Data in JSON format from Mongo DB")
+    response.write("All Genres Data in JSON format from Mongo DB");
+    response.end();
   }).listen(port);
