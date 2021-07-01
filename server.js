@@ -41,12 +41,13 @@ db.mongoose
  require("./routes/movie.routes")(app);
   require("./routes/genre.routes")(app);
   require("./routes/artist.routes")(app);
+  require("./routes/user.routes")(app);
   app.get("/", (req, res) => {
     res.json({ message: "Movie booking application" });
   });
 //require("./app/routes/user.routes")(app);
 
-const PORT =  3000;
+const PORT =  8085;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
