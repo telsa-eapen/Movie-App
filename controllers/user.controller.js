@@ -132,4 +132,116 @@ User.findOneAndUpdate({"uuid": req.body.uuid}, update)
     });
   });
 };
-             
+exports.getCouponCode = (req, res) => {
+    console.log("In coupen code");
+    console.log(req.headers.authorization);
+    const tokenReceived  = req.headers.authorization.split(" ")[1];
+    console.log(tokenReceived);
+    User.find({"accesstoken": tokenReceived})
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: "Some error occurred, please try again later."
+        });
+      } else 
+      {
+        console.log(data);
+        console.log(data[0].coupens);
+  
+        var sendCoupenData = null;
+        for(i=0;i<data[0].coupens.length;i++)
+        {
+          // console.log(data[0].coupens[i].id);
+          // console.log(data[0].coupens[i].discountValue);
+  
+          if(data[0].coupens[i].id ==req.query.code)
+          {
+            sendCoupenData = data[0].coupens[i]; //data[0].coupens[i].discountValue;
+            break;
+          }
+        }
+  
+        res.send(sendCoupenData);
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error validating token!."
+      });
+    });
+   
+    
+  };
+  
+  exports.bookShow = (req, res) => {
+
+    var update = null;
+    var newRefNo = null;
+  
+    // Validate request
+    if (!req.body.customerUuid) {
+      res.status(400).send({ message: "ID Not Found!" });
+      return;
+    }
+    
+    //Find the user
+    User.find({"uuid": req.body.customerUuid})
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: "Some error occurred, please try again later."
+        });
+      } 
+      else 
+      {
+        console.log("Currently Available Booking Requests Data of User");
+        console.log(data[0].bookingRequests)
+        
+        console.log("After Adding New Booking Requests");
+        
+        newRefNo = new Date().getMilliseconds().toString() + Math.floor(Math.random()*100).toString();
+        req.body.bookingRequest.reference_number =newRefNo;
+  
+        data[0].bookingRequests.push(
+          req.body.bookingRequest);
+       
+        console.log(data[0].bookingRequests)
+  
+        bookingRequests = data[0].bookingRequests;
+  
+        update = {bookingRequests: data[0].bookingRequests};
+        if(update!=null)
+        {
+          console.log("Inside update")
+            User.findOneAndUpdate({"uuid": req.body.customerUuid}, update)
+            .then(data1 => {
+              if (!data1) {
+                res.status(404).send({
+                  message: "Some error occurred, please try again later."
+                });
+              } 
+              else 
+              {
+                console.log("Done update");
+                console.log(update);
+                console.log("sending reference No: " + newRefNo);
+                res.send({ reference_number: newRefNo });
+              }
+            })
+            .catch(err => {
+              res.status(500).send({
+                message: "Error updating."
+              });
+            });
+        }
+    }
+})
+.catch(err => {
+  res.status(500).send({
+    message: "Error validating token!."
+  });
+});
+
+ 
+
+};                 
